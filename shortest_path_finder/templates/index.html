@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Shortest Path Finder</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Real-World Shortest Path Finder</h1>
+
+        <p class="subtitle">
+            Find the shortest path using Dijkstra's Algorithm
+        </p>
+
+        <!-- Location Selection -->
+        <div class="controls">
+
+            <div class="input-group">
+                <label for="source">From:</label>
+
+                <select id="source">
+
+                    <option value="">Select Source</option>
+
+                    <option value="Railway Station">
+                        Railway Station
+                    </option>
+
+                    <option value="Clock Tower">
+                        Clock Tower
+                    </option>
+
+                    <option value="Bus Stand">
+                        Bus Stand
+                    </option>
+
+                    <option value="Ferozepur Road">
+                        Ferozepur Road
+                    </option>
+
+                </select>
+            </div>
+
+
+            <div class="input-group">
+                <label for="destination">To:</label>
+
+                <select id="destination">
+
+                    <option value="">Select Source</option>
+
+                    <option value="Railway Station">
+                        Railway Station
+                    </option>
+
+                    <option value="Clock Tower">
+                        Clock Tower
+                    </option>
+
+                    <option value="Bus Stand">
+                        Bus Stand
+                    </option>
+
+                    <option value="Ferozepur Road">
+                        Ferozepur Road
+                    </option>
+
+                </select>
+            </div>
+
+
+            <button id="findPath">
+                Find Shortest Path
+            </button>
+
+        </div>
+
+
+        <!-- Map -->
+        <div id="map"></div>
+
+
+        <!-- Result -->
+        <div class="result">
+
+            <h2>Result</h2>
+
+            <div class="result-box">
+
+                <p>
+                    <strong>Shortest Distance:</strong>
+                    <span id="distance">--</span>
+                </p>
+
+                <p>
+                    <strong>Nodes Visited:</strong>
+                    <span id="nodes">--</span>
+                </p>
+
+                <p>
+                    <strong>Execution Time:</strong>
+                    <span id="time">--</span>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
