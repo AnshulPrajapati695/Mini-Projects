@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="container nav">
+        <h2>Expense Tracker</h2>
+        <a class="button" href="{{ url_for('add_expense') }}">
+            + Add Expense
+        </a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="intro">
+        <h1>Dashboard</h1>
+        <p>Track your spending and manage your money.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="message {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="summary">
+        <div class="card">
+            <p>Total Expenses</p>
+            <h2>₹{{ "%.2f"|format(total) }}</h2>
+        </div>
+
+        <div class="card">
+            <p>Total Transactions</p>
+            <h2>{{ count }}</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Category Summary</h2>
+
+        {% if category_totals %}
+            <div class="category-list">
+                {% for item in category_totals %}
+                    <div class="category-row">
+                        <span>{{ item.category }}</span>
+                        <strong>
+                            ₹{{ "%.2f"|format(item.total) }}
+                        </strong>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty">No expenses to analyze yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Recent Transactions</h2>
+
+        {% if expenses %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                            <tr>
+                                <td>{{ expense.expense_date }}</td>
+                                <td>{{ expense.title }}</td>
+                                <td>
+                                    <span class="category-tag">
+                                        {{ expense.category }}
+                                    </span>
+                                </td>
+                                <td class="amount">
+                                    ₹{{ "%.2f"|format(expense.amount) }}
+                                </td>
+                                <td>{{ expense.description or "-" }}</td>
+                                <td>
+                                    <form
+                                        action="{{ url_for('delete_expense', expense_id=expense.id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Delete this expense?');">
+                                        <button class="delete-button"
+                                                type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty">
+                No expenses recorded yet. Add your first expense!
+            </p>
+            <a class="button" href="{{ url_for('add_expense') }}">
+                Add Your First Expense
+            </a>
+        {% endif %}
+    </section>
+</main>
+
+<footer>
+    <p>Personal Expense Tracker · Built with Python and Flask</p>
+</footer>
+
+</body>
+</html>
