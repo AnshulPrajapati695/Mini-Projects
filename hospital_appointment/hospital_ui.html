@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>City Hospital Appointments</title>
+<style>
+:root{--bg:#f3f7f8;--card:#fff;--ink:#10303f;--mut:#5a7480;--line:#d5e1e5;--acc:#0b7a75;--acc-ink:#fff;--bad:#b3372f;--ok:#2c7a3f;--code:#10303f;--code-ink:#bfe8e3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a20;--card:#14262e;--ink:#e4f0f2;--mut:#8fa8b1;--line:#25404a;--acc:#3cc0b8;--acc-ink:#08201f;--bad:#ee7d74;--ok:#7bd08c;--code:#091419;--code-ink:#9fe0d9}}
+:root[data-theme="dark"]{--bg:#0d1a20;--card:#14262e;--ink:#e4f0f2;--mut:#8fa8b1;--line:#25404a;--acc:#3cc0b8;--acc-ink:#08201f;--bad:#ee7d74;--ok:#7bd08c;--code:#091419;--code-ink:#9fe0d9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Figtree",system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:28px 20px 8px;max-width:1100px;margin:auto}
+h1{margin:0;font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em}
+header p{margin:4px 0 0;color:var(--mut)}
+main{max-width:1100px;margin:auto;padding:16px 20px 40px;display:grid;gap:20px;grid-template-columns:minmax(0,380px) minmax(0,1fr)}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+h2{margin:0 0 12px;font-size:1.1rem}
+label{display:block;font-size:.85rem;color:var(--mut);margin:12px 0 4px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{padding:9px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
+.slot[aria-pressed=true]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:700}
+.slot:disabled{text-decoration:line-through;opacity:.4;cursor:not-allowed}
+.btn{padding:10px 16px;border:0;border-radius:8px;background:var(--acc);color:var(--acc-ink);font:inherit;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:500}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.full{width:100%;margin-top:18px}
+#msg{min-height:1.4em;margin-top:10px;font-size:.9rem}
+.err{color:var(--bad)}.good{color:var(--ok)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.88rem}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:600}
+.tag{padding:2px 9px;border-radius:999px;font-size:.8rem;border:1px solid currentColor}
+.BOOKED{color:var(--acc)}.CANCELLED{color:var(--bad)}.COMPLETED{color:var(--ok)}
+.empty{color:var(--mut);padding:16px 0}
+.bridge{grid-column:1/-1}
+.bridge p{margin:0 0 10px;color:var(--mut);font-size:.92rem}
+pre{margin:0;background:var(--code);color:var(--code-ink);padding:14px;border-radius:10px;max-height:240px;overflow:auto;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header>
+  <h1>City Hospital</h1>
+  <p>Book, complete or cancel appointments. Every action also writes the matching PL/SQL call.</p>
+</header>
+<main>
+  <section>
+    <h2>New appointment</h2>
+    <label for="name">Patient name</label><input id="name" autocomplete="off">
+    <label for="phone">Phone</label><input id="phone" inputmode="numeric" maxlength="10" autocomplete="off">
+    <label for="doc">Doctor</label><select id="doc"></select>
+    <label for="date">Date</label><input id="date" type="date">
+    <label>Time slot</label><div class="slots" id="slots"></div>
+    <button class="btn full" id="book">Book appointment</button>
+    <div id="msg" role="status"></div>
+  </section>
+  <section>
+    <h2>Appointments</h2>
+    <div class="stats" id="stats"></div>
+    <div class="wrap"><table>
+      <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Slot</th><th>Status</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="empty" id="empty">No appointments yet. Book the first one on the left.</div>
+  </section>
+  <section class="bridge">
+    <h2>PL/SQL calls for Oracle Live SQL</h2>
+    <p>Run <b>hospital_appointment.sql</b> once in Live SQL. Then copy these calls and run them there, in the same order, to save the same data in the Oracle database.</p>
+    <pre id="log">-- Your PL/SQL calls will appear here.</pre>
+    <div class="row">
+      <button class="btn" id="copy">Copy all calls</button>
+      <button class="btn ghost" id="reset">Reset demo data</button>
+    </div>
+  </section>
+</main>
+<script>
+const DOCS=[{id:1,n:"Dr. Anita Sharma",s:"Cardiology"},{id:2,n:"Dr. Rohan Mehta",s:"Orthopedics"},{id:3,n:"Dr. Simran Kaur",s:"Pediatrics"},{id:4,n:"Dr. Vikram Singh",s:"General"}];
+const SLOTS=["09:00","10:00","11:00","12:00","14:00","15:00","16:00","17:00"];
+let appts=[],calls=[],pick=null;
+const $=id=>document.getElementById(id);
+const q=s=>s.replace(/'/g,"''");
+function load(){try{appts=JSON.parse(localStorage.getItem("hx_a")||"[]");calls=JSON.parse(localStorage.getItem("hx_c")||"[]")}catch(e){appts=[];calls=[]}}
+function save(){try{localStorage.setItem("hx_a",JSON.stringify(appts));localStorage.setItem("hx_c",JSON.stringify(calls))}catch(e){}}
+const taken=(d,dt,s)=>appts.some(a=>a.doc==d&&a.date==dt&&a.slot==s&&a.status=="BOOKED");
+function say(t,c){$("msg").textContent=t;$("msg").className=c||""}
+function drawSlots(){
+  const d=+$("doc").value,dt=$("date").value;
+  if(pick&&taken(d,dt,pick))pick=null;
+  $("slots").innerHTML="";
+  SLOTS.forEach(s=>{const b=document.createElement("button");b.type="button";b.className="slot";b.textContent=s;
+    b.disabled=!!dt&&taken(d,dt,s);b.setAttribute("aria-pressed",pick==s);
+    b.onclick=()=>{pick=s;drawSlots()};$("slots").appendChild(b)});
+}
+function draw(){
+  const c=k=>appts.filter(a=>a.status==k).length;
+  $("stats").innerHTML=`<span class="stat">Booked ${c("BOOKED")}</span><span class="stat">Completed ${c("COMPLETED")}</span><span class="stat">Cancelled ${c("CANCELLED")}</span>`;
+  $("empty").style.display=appts.length?"none":"block";
+  $("rows").innerHTML="";
+  appts.slice().sort((a,b)=>(a.date+a.slot).localeCompare(b.date+b.slot)).forEach(a=>{
+    const tr=document.createElement("tr"),dn=DOCS.find(x=>x.id==a.doc).n;
+    tr.innerHTML=`<td></td><td>${dn}</td><td>${a.date}</td><td>${a.slot}</td><td><span class="tag ${a.status}">${a.status.toLowerCase()}</span></td><td></td>`;
+    tr.cells[0].textContent=a.name;
+    if(a.status=="BOOKED"){
+      const k=(t,st,fn)=>{const b=document.createElement("button");b.className="btn ghost sm";b.textContent=t;b.onclick=()=>change(a,st,fn);tr.cells[5].append(b," ")};
+      k("Complete","COMPLETED","complete_appointment");k("Cancel","CANCELLED","cancel_appointment");
+    }
+    $("rows").appendChild(tr);
+  });
+  $("log").textContent=calls.length?calls.join("\n"):"-- Your PL/SQL calls will appear here.";
+  drawSlots();
+}
+function change(a,st,fn){
+  a.status=st;
+  calls.push(`BEGIN hospital_pkg.${fn}(${a.doc},DATE '${a.date}','${a.slot}'); END;\n/`);
+  save();draw();say("Appointment "+st.toLowerCase()+".","good");
+}
+$("book").onclick=()=>{
+  const name=$("name").value.trim(),phone=$("phone").value.trim(),doc=+$("doc").value,date=$("date").value;
+  if(!name)return say("Enter the patient’s name.","err");
+  if(!/^\d{10}$/.test(phone))return say("Enter a 10-digit phone number.","err");
+  if(!date)return say("Choose a date.","err");
+  if(!pick)return say("Choose a time slot.","err");
+  if(taken(doc,date,pick))return say("That slot is already booked for this doctor.","err");
+  appts.push({name,phone,doc,date,slot:pick,status:"BOOKED"});
+  calls.push(`BEGIN hospital_pkg.book_appointment('${q(name)}','${phone}',${doc},DATE '${date}','${pick}'); END;\n/`);
+  save();pick=null;$("name").value="";$("phone").value="";draw();say("Appointment booked.","good");
+};
+$("copy").onclick=async()=>{
+  const t=calls.join("\n");if(!t)return;
+  try{await navigator.clipboard.writeText(t);$("copy").textContent="Copied"}
+  catch(e){const r=document.createRange();r.selectNodeContents($("log"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("copy").textContent="Selected: press Ctrl+C"}
+  setTimeout(()=>$("copy").textContent="Copy all calls",1800);
+};
+$("reset").onclick=()=>{if(confirm("Clear all appointments and the call list?")){appts=[];calls=[];save();draw();say("")}};
+$("doc").innerHTML=DOCS.map(d=>`<option value="${d.id}">${d.n} (${d.s})</option>`).join("");
+$("doc").onchange=$("date").onchange=drawSlots;
+const t=new Date();t.setDate(t.getDate()+1);
+$("date").min=$("date").value=t.toISOString().slice(0,10);
+load();draw();
+</script>
+</body>
+</html>
