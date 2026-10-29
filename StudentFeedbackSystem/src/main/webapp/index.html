@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Feedback System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Student Feedback System</h1>
+        <p class="subtitle">
+            Share your feedback about a faculty member. Fields marked
+            <span class="required">*</span> are required.
+        </p>
+
+        <!-- Error message from the servlet appears here (hidden by default) -->
+        <div id="messageBox" class="message hidden"></div>
+
+        <!-- The form sends a POST request to the servlet at /feedback -->
+        <form action="feedback" method="post">
+            <input type="hidden" name="action" value="add">
+
+            <label for="studentName">Student Name <span class="required">*</span></label>
+            <input type="text" id="studentName" name="studentName"
+                   maxlength="80" placeholder="Enter your name" required>
+
+            <label for="faculty">Faculty <span class="required">*</span></label>
+            <select id="faculty" name="faculty" required>
+                <option value="">-- Select Faculty --</option>
+                <option value="Faculty A">Faculty A</option>
+                <option value="Faculty B">Faculty B</option>
+                <option value="Faculty C">Faculty C</option>
+                <option value="Faculty D">Faculty D</option>
+                <option value="Faculty E">Faculty E</option>
+            </select>
+
+            <label>Rating <span class="required">*</span></label>
+            <div class="radio-group">
+                <label><input type="radio" name="rating" value="1" required> Very Bad</label>
+                <label><input type="radio" name="rating" value="2"> Bad</label>
+                <label><input type="radio" name="rating" value="3"> Good</label>
+                <label><input type="radio" name="rating" value="4"> Very Good</label>
+                <label><input type="radio" name="rating" value="5"> Excellent</label>
+            </div>
+
+            <label for="comments">Comments <span class="hint">(optional, max 1000 characters)</span></label>
+            <textarea id="comments" name="comments" maxlength="1000"
+                      placeholder="Write your comments here..."></textarea>
+
+            <div class="button-row">
+                <button type="submit" class="btn">Submit Feedback</button>
+                <!-- A normal link = GET request, so no validation happens -->
+                <a href="feedback?action=list" class="btn btn-secondary">View All Feedback</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tiny script: shows ?error=... from the servlet. textContent keeps it safe. -->
+        <!-- Shows messages sent back by the servlet.
+         textContent is used so the text can never run as HTML. -->
+    <script>
+        var params = new URLSearchParams(window.location.search);
+        var box = document.getElementById("messageBox");
+
+        if (params.get("status") === "added") {
+            box.textContent = "Success! Your feedback was saved.";
+            box.className = "message success";
+        } else if (params.get("error")) {
+            box.textContent = params.get("error");
+            box.className = "message error";
+        }
+    </script>
+</body>
+</html>

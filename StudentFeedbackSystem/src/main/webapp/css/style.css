@@ -1,0 +1,188 @@
+/* ===== General page style ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.container.wide {
+    max-width: 1000px;
+}
+
+h1 {
+    color: #1e4e8c;
+    margin-top: 0;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* ===== Form ===== */
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.radio-group label {
+    display: inline-block;
+    font-weight: normal;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.required {
+    color: #c0392b;
+}
+
+.hint {
+    font-size: 13px;
+    color: #777;
+    font-weight: normal;
+}
+
+/* ===== Buttons and links styled as buttons ===== */
+.btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #1e4e8c;
+}
+
+.btn:hover {
+    opacity: 0.88;
+}
+
+.btn-secondary {
+    background-color: #555;
+}
+
+.btn-edit {
+    background-color: #2e8b57;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.btn-delete {
+    background-color: #c0392b;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.button-row {
+    margin-top: 22px;
+}
+
+.button-row .btn {
+    margin-right: 8px;
+}
+
+/* ===== Messages ===== */
+.message {
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.success {
+    background-color: #e6f4ea;
+    color: #1e7e34;
+    border: 1px solid #b7dfc2;
+}
+
+.error {
+    background-color: #fdecea;
+    color: #b02a1f;
+    border: 1px solid #f5c6c2;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ===== Feedback table ===== */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #1e4e8c;
+    color: #ffffff;
+}
+
+tr:nth-child(even) {
+    background-color: #f7f9fc;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+}
+
+/* ===== Small screens ===== */
+@media (max-width: 600px) {
+    .container {
+        padding: 18px;
+    }
+    .radio-group label {
+        display: block;
+    }
+}
